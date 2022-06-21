@@ -5,13 +5,28 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import tim7.ISAMRSproject.config.WebConfig;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import tim7.ISAMRSproject.model.*;
 import tim7.ISAMRSproject.repository.ClientRepository;
 import tim7.ISAMRSproject.repository.ReservationRepository;
 import tim7.ISAMRSproject.service.*;
 
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -23,106 +38,28 @@ import java.util.concurrent.Future;
 @SpringBootTest
 public class ChangingEntityTests {
 
+    private static final String URL_PREFIX = "/api/cottages";
+
+    private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+            MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+
+    private MockMvc mockMvc;
 
     @Autowired
-    private ReservationServiceOwner reservationServiceOwner;
-    @Autowired
-    private CottageService cottageService;
-    @Autowired
-    private ClientService clientService;
+    private WebApplicationContext webApplicationContext;
 
-    @Test(expected = ObjectOptimisticLockingFailureException.class)
-    public void testChangeNameWhenClientReserve() throws Throwable {
-
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<?> future1 = executor.submit(new Runnable() {
-
-            @Override
-            public void run() {
-
-                System.out.println("Startovan Thread 1");
-                Cottage cottage = cottageService.getCottageById(1).get();
-
-                try { Thread.sleep(3000); } catch (InterruptedException e) {}
-                cottageService.editCottage(cottage,cottage.getId(),"Novo ime","novi opis",365,50);
-            }
-        });
-
-
-        executor.submit(new Runnable() {
-
-            @Override
-            public void run() {
-
-                System.out.println("Thread 2 start");
-
-                Cottage cottage = cottageService.getCottageById(1).get();
-                Client client = clientService.findClientById(10);
-                LocalDateTime startDate = LocalDateTime.now();
-                LocalDateTime endDate = LocalDateTime.now().plusDays(7);
-                Reservation newRes = reservationServiceOwner.reserveCottage(cottage,client,startDate,endDate);
-                reservationServiceOwner.saveReservation(newRes);
-
-
-            }
-        });
-
-        try {
-            future1.get(); // podize ExecutionException za bilo koji izuzetak iz prvog child threada
-        } catch (ExecutionException e) {
-            System.out.println("Exception from thread " + e.getCause().getClass()); // u pitanju je bas ObjectOptimisticLockingFailureException
-            throw e.getCause();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        executor.shutdown();
+    @Before
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
     }
 
-    @Test(expected = ObjectOptimisticLockingFailureException.class)
-    public void testClientReserveWhenOwnerEditCottage() throws Throwable {
-
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<?> future1 = executor.submit(new Runnable() {
-
-            @Override
-            public void run() {
-
-                System.out.println("Startovan Thread 1");
-                Cottage cottage = cottageService.getCottageById(1).get();
-                Client client = clientService.findClientById(10);
-                LocalDateTime startDate = LocalDateTime.now();
-                LocalDateTime endDate = LocalDateTime.now().plusDays(7);
-
-                try { Thread.sleep(3000); } catch (InterruptedException e) {}
-                Reservation newRes = reservationServiceOwner.reserveCottage(cottage,client,startDate,endDate);
-                reservationServiceOwner.saveReservation(newRes);
-            }
-        });
-
-
-        executor.submit(new Runnable() {
-
-            @Override
-            public void run() {
-
-                System.out.println("Thread 2 start");
-
-
-                Cottage cottage = cottageService.getCottageById(1).get();
-
-                cottageService.editCottage(cottage,cottage.getId(),"Novo ime","novi opis",365,50);
-
-            }
-        });
-
-        try {
-            future1.get(); // podize ExecutionException za bilo koji izuzetak iz prvog child threada
-        } catch (ExecutionException e) {
-            System.out.println("Exception from thread " + e.getCause().getClass()); // u pitanju je bas ObjectOptimisticLockingFailureException
-            throw e.getCause();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        executor.shutdown();
+    @Test
+    public void cottageInfoTest() throws Exception {
+        mockMvc.perform(get(URL_PREFIX + "/getCottage/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.name").value("Vikendica Kosmaj"))
+                .andReturn();
     }
+
 }
