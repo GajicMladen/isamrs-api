@@ -53,7 +53,7 @@ public class ChangingEntityTests {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
     }
 
-    @Test
+    //@Test
     public void cottageInfoTest() throws Exception {
         mockMvc.perform(get(URL_PREFIX + "/getCottage/1"))
                 .andExpect(status().isOk())
