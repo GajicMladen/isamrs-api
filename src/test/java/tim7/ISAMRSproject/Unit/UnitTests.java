@@ -8,7 +8,10 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import tim7.ISAMRSproject.config.WebConfig;
 import tim7.ISAMRSproject.model.*;
 import tim7.ISAMRSproject.repository.*;
 import tim7.ISAMRSproject.service.*;
@@ -27,6 +30,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@WebAppConfiguration
+@ContextConfiguration(classes = WebConfig.class)
 public class UnitTests {
 
 
@@ -100,7 +105,6 @@ public class UnitTests {
     @Mock
     private Boat boatMock;
     @Test
-    @Transactional
     public void testAddBoat() {
         // 1.
         when(boatRepository.save(boatMock)).thenReturn(boatMock);
@@ -114,7 +118,6 @@ public class UnitTests {
     @Mock
     private Cottage cottageMock;
     @Test
-    @Transactional
     public void testAddCottage() {
         // 1.
         when(cottageRepository.save(cottageMock)).thenReturn(cottageMock);
@@ -127,7 +130,6 @@ public class UnitTests {
     }
 
     @Test(expected = DataIntegrityViolationException.class)
-    @Transactional
     @Rollback(true)
     public void testSaveBoatIdNUll() {
         Boat boat = new Boat();
@@ -146,7 +148,6 @@ public class UnitTests {
         verifyNoMoreInteractions(boatRepository);
     }
     @Test(expected = DataIntegrityViolationException.class)
-    @Transactional
     @Rollback(true)
     public void testSaveCottageIdNUll() {
         Cottage c = new Cottage();
