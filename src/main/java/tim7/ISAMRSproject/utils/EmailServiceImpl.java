@@ -33,7 +33,7 @@ public class EmailServiceImpl {
 	public void sendConfirmationMail(User user) {
 		String confirmationBody = "Dear " + user.getName() + " " + user.getLastName() + ", \n";
 		confirmationBody += "Thank you for joining Go Fishing! In order to activate your account, ";
-		confirmationBody += "please visit the following link: http://localhost:8080/reg/activate/" + user.getId().toString();
+		confirmationBody += "please visit the following link: https://gofishingapp.herokuapp.com/reg/activate/" + user.getId().toString();
 		sendSimpleMessage(user.getEmail(), CONFIRMATION_SUBJECT, confirmationBody);
 	}
 

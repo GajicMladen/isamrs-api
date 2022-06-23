@@ -30,7 +30,7 @@ import tim7.ISAMRSproject.utils.EmailServiceImpl;
 
 @RestController
 @RequestMapping(value = "adventure")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://go-fishing-ui.web.app")
 public class AdventureController {
 
 	@Autowired

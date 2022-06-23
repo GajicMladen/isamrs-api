@@ -44,7 +44,7 @@ import tim7.ISAMRSproject.utils.EmailServiceImpl;
 
 @RestController
 @RequestMapping(value = "admin")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://go-fishing-ui.web.app")
 public class AdminController {
 
 	@Autowired

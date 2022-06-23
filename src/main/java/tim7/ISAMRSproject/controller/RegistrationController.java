@@ -27,9 +27,9 @@ import tim7.ISAMRSproject.utils.EmailServiceImpl;
 @RequestMapping(value="/reg", produces=MediaType.APPLICATION_JSON_VALUE)
 public class RegistrationController {
 	
-	private String SUCCESSFUL_ACTIVATION_REDIRECT = "http://localhost:4200/login/success";
-	private String ALREADY_ACTIVE_REDIRECT = "http://localhost:4200/login/alreadyactive";
-	private String INVALID_ACTIVATION_TRY = "http://localhost:4200/login/invalidactivation";
+	private String SUCCESSFUL_ACTIVATION_REDIRECT = "https://go-fishing-ui.web.app/login/success";
+	private String ALREADY_ACTIVE_REDIRECT = "https://go-fishing-ui.web.app/login/alreadyactive";
+	private String INVALID_ACTIVATION_TRY = "https://go-fishing-ui.web.app/login/invalidactivation";
 	
 	@Autowired
 	private UserService userService;

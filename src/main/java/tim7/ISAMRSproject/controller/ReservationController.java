@@ -46,7 +46,7 @@ import tim7.ISAMRSproject.utils.EmailServiceImpl;
 
 @RestController
 @RequestMapping(value = "api/reservations")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://go-fishing-ui.web.app")
 public class ReservationController {
 
     @Autowired
